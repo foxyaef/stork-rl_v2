@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stork-rl"
+version = "0.1.0"
+description = "A headless-first reinforcement-learning recreation of Walk the Stork"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "gymnasium>=0.29,<2",
+  "numpy>=1.24,<3",
+  # pygame-ce keeps the same `import pygame` API and publishes Windows wheels
+  # for new Python releases (including Python 3.14).
+  "pygame-ce>=2.5.6,<3",
+]
+
+[project.optional-dependencies]
+train = [
+  "stable-baselines3>=2.3,<3",
+  "tensorboard>=2.15,<3",
+]
+test = ["pytest>=8,<9"]
+live = [
+  "opencv-python>=4.10,<5",
+  "playwright>=1.50,<2",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

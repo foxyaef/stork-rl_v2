@@ -1,0 +1,58 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Packaging output
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+.venv*/
+venv/
+env/
+
+# Trained policies, normalization statistics, checkpoints and TensorBoard logs
+# Model version histories remain documented in README.md and TRAINING_RESULTS.md.
+/models*/
+# Publish only the current recommended v9 policy and its matching statistics.
+!/models_browser_v9/
+/models_browser_v9/*
+!/models_browser_v9/stork_ppo.zip
+!/models_browser_v9/vec_normalize.pkl
+/smoke-model/
+/runs/
+checkpoints/
+tensorboard/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Runtime logs, captures and local browser output
+/logs/
+*.log
+playwright-report/
+test-results/
+
+# Original/downloaded Flash files are not source code for this repository
+*.swf
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

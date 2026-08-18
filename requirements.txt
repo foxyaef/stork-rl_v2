@@ -1,0 +1,11 @@
+# Complete runtime used by training, evaluation, rendering, tests and live control.
+# Tested together on Windows; see environments.txt for the full transitive snapshot.
+gymnasium==1.3.0
+numpy==2.5.1
+pygame-ce==2.5.7
+torch==2.13.0
+stable-baselines3==2.9.0
+tensorboard==2.21.0
+opencv-python==4.13.0.92
+playwright==1.61.0
+pytest==8.4.2
