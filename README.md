@@ -9,6 +9,12 @@ Gymnasium 강화학습 환경입니다. 학습과 평가는 화면 없이 빠르
 실게임에서 중요했던 평균 각도와 `|vel|>1` 체류율을 함께 고려해 v9을 기본으로
 유지합니다.
 
+**실제 웹 게임 결과 (2026-11-26):** 화면 스트리밍 캡처(`--capture screencast`)와
+상태 추정기 보정(키 효과와 중력 0.8배)을 적용한 뒤 PPO v9는 5판 모두 200m를
+넘겼고(평균 409.2m, 최고 518m), 규칙 기반 제어기(`--agent pd`)도 5판 모두
+넘겼습니다(평균 483.8m, 최고 584m). 실험 기록과 분석은
+[LIVE_RESULTS.md](LIVE_RESULTS.md)에 있습니다.
+
 > 이 GitHub 저장소에는 현재 권장 모델인 v9의 최종 정책과 정규화 통계만
 > 포함합니다. 다른 버전의 모델, 체크포인트, TensorBoard 기록과 실게임 로그는
 > 포함하지 않으며 모델 버전별 설계와 평가 결과만 문서에 보존합니다.
@@ -26,11 +32,18 @@ Gymnasium 강화학습 환경입니다. 학습과 평가는 화면 없이 빠르
 - 중앙 안정, 연속 입력, `NONE`, 각도·각속도 개선 및 고각속도 회복 보상 실험 완료
 - 로컬 작업 폴더에 v1~v15 모델과 각 모델의 관측 정규화 통계 보존 완료
 - GitHub용 문서에 모델 파일 없이도 v1~v15 실험 이력과 평가 결과 보존 완료
+- 실제 게임 로그 분석으로 상태 추정기 계수 보정 완료 (키 효과와 중력 0.25 → 0.8)
+- Chrome 화면 스트리밍 캡처 추가 완료 (판단 한 번 117ms → 33ms)
+- 비교용 규칙 기반 에이전트 추가 완료 (`lookahead`, `pd`)
+- 실제 웹 게임 200m 달성 (PPO v9 5/5판, 규칙 기반 5/5판)
+- 실제 파이프라인 재현 시뮬레이터와 분석 스크립트 추가 (`analysis/`)
+- v16 (실측 판단 간격 반영 재학습) 시뮬레이터 평가 완료, 실제 게임은 미측정
 - 현재 자동 선택 모델: `models_browser_v9`
 - 테스트 상태: 40개 통과
 
 원본 판정의 상세한 업데이트 순서는 [ORIGINAL_LOGIC.md](ORIGINAL_LOGIC.md),
-버전별 실험 결과는 [TRAINING_RESULTS.md](TRAINING_RESULTS.md)에 있습니다.
+버전별 실험 결과는 [TRAINING_RESULTS.md](TRAINING_RESULTS.md), 실제 웹 게임
+실험은 [LIVE_RESULTS.md](LIVE_RESULTS.md)에 있습니다.
 
 ## 2. 환경 구성
 
@@ -92,11 +105,15 @@ evaluate.py                     정확 환경 평가
 evaluate_browser.py             브라우저 환경 통계 평가
 play.py                         수동/규칙/모델 Pygame 실행
 live_browser_test.py            실제 웹 게임 인식 및 입력
+loop_stats.py                   실게임 CSV 로그 요약 (루프 속도, 판별 추정 거리)
+analysis/                       재현 시뮬레이터와 RL vs 규칙 기반 분석 스크립트
+experiments/live_games.csv      실제 게임 판별 기록
 setup.ps1                       기본·학습·테스트 환경 설치
 setup-live.ps1                  OpenCV·Playwright·Chromium 설치
 requirements.txt                전체 기능에 필요한 직접 의존성 고정 버전
 environments.txt                검증 환경의 전이 의존성까지 포함한 전체 스냅샷
-TRAINING_RESULTS.md             v1~v15 학습·평가 기록
+TRAINING_RESULTS.md             v1~v16 학습·평가 기록
+LIVE_RESULTS.md                 실제 웹 게임 실험 결과와 Sim-to-Real 분석
 ORIGINAL_LOGIC.md               원본 ActionScript 판정 정리
 ```
 
@@ -410,6 +427,13 @@ python evaluate_browser.py --episodes 200 `
   --projection-frames-min 4 --projection-frames-max 6
 ```
 
+규칙 기반 에이전트 비교 (`heuristic`, `lookahead`, `pd`):
+
+```powershell
+python evaluate_browser.py --episodes 200 --agent pd `
+  --projection-frames-min 4 --projection-frames-max 6
+```
+
 평가기는 거리의 평균·중앙값·p10·p90, 생존 시간, 방향키 사용률, 연속 입력,
 즉시 반전, 입력 후 `NONE`, 평균 절대 각도, 각도·각속도 교정 성공률,
 고각속도 체류율과 위험 구간 회복률을 출력합니다.
@@ -457,6 +481,27 @@ python live_browser_test.py --control `
 `--arm-immediately`를 추가할 수 있지만, 새 보정값이나 새 모델은 먼저 인식
 전용 모드로 확인하는 것이 안전합니다.
 
+### 권장 실행: 화면 스트리밍 (200m 달성 설정)
+
+```powershell
+# PPO v9 (기본 모델 자동 선택)
+python live_browser_test.py --control --capture screencast --debug-every 3 --log logs\cast_v9.csv
+
+# 규칙 기반 제어기 (모델 없이 동작)
+python live_browser_test.py --control --capture screencast --debug-every 3 --agent pd --log logs\cast_pd.csv
+```
+
+`--capture screencast`는 매번 스크린샷을 요청하는 대신(약 95ms) Chrome DevTools
+Protocol의 `Page.startScreencast`로 크롬이 그리는 프레임을 스트리밍으로 받아
+판단 한 번을 약 33ms(1 Flash 프레임)로 줄입니다. 이 설정에서 PPO v9는 평균
+409.2m, 규칙 기반 제어기는 평균 483.8m를 기록했습니다. 로그는 실행할 때마다
+덮어쓰므로 실험마다 `--log` 이름을 바꾸고, 실행 뒤 다음 명령으로 루프 속도와
+판별 추정 거리를 확인합니다(공식 기록은 화면의 거리).
+
+```powershell
+python loop_stats.py logs\cast_v9.csv
+```
+
 ### 상태 추정기
 
 실게임 측정값은 모델로 바로 전달되지 않습니다. 상태 추정기는 이전 각도와
@@ -469,7 +514,8 @@ python live_browser_test.py --control `
 - 800ms 이상 지난 뒤 정상 측정이 들어오면 해당 값으로 다시 동기화
 - 2초 이상 `stale` 뒤 신뢰도 높은 정상 자세가 나타나면 새 게임으로 판정
 - 새 게임에서는 난이도·전진 속도와 세션 경과 시간을 `1.0`·`0`부터 초기화
-- 실제로 보낸 방향키 펄스는 실로그에서 측정한 보수적 효과만 각속도에 반영
+- 실제로 보낸 방향키 펄스와 측정 사이의 중력은 실로그에서 측정한 크기(원본 물리의
+  약 0.8배)로 반영. 이전 기본값 0.25에서는 같은 키를 연타하는 문제가 있었음
 
 디버그 창의 `state`는 `measured`, `outlier`, `predicted`, `stale` 중 하나이며,
 `residual`은 측정 각도와 사전 예측 각도의 차이입니다. 최근 실패 로그를
@@ -488,11 +534,21 @@ python live_browser_test.py --control `
 | `--reacquire-after-ms` | 800 | 장시간 누락 후 새 측정값으로 재동기화할 시간 |
 | `--innovation-gate-deg` | 10 | 측정 이상치 판정의 기본 허용 각도 |
 | `--confidence-gate-deg` | 18 | 신뢰도에 따라 추가되는 허용 각도 |
-| `--estimator-action-scale` | 0.25 | 키 펄스 효과를 추정 상태에 반영하는 비율 |
-| `--estimator-physics-scale` | 0.25 | 측정 사이 원본 물리 가속을 혼합하는 비율 |
+| `--estimator-action-scale` | 0.8 | 키 펄스 효과를 추정 상태에 반영하는 비율 |
+| `--estimator-physics-scale` | 0.8 | 측정 사이 원본 물리 가속을 혼합하는 비율 |
 | `--session-reset-gap-ms` | 2000 | 이 시간 이상 공백 뒤 정상 황새가 나타나면 새 게임으로 초기화 |
 | `--clip` | 자동 | 게임 영역 자동 탐색 실패 시 `x,y,w,h` 지정 |
 | `--load-wait` | 12 | 페이지 로딩 대기 시간(초) |
+| `--capture` | screenshot | `screencast`: Chrome 화면 스트리밍 (권장, 판단 약 33ms) |
+| `--screencast-quality` | 70 | 스트리밍 JPEG 품질 |
+| `--screencast-max-width` | 1280 | 스트리밍 프레임 최대 너비 |
+| `--screencast-age-ms` | 20 | 도착한 프레임의 추정 나이 (측정 시각 = 도착 시각 − 이 값) |
+| `--debug-every` | 1 | 디버그 창을 N번에 한 번만 그림 (3 권장) |
+| `--agent` | model | `model`(PPO), `heuristic`, `lookahead`, `pd` |
+| `--pd-gain` | 12 | 규칙 기반: `각도 + gain × 각속도`의 각속도 가중치 |
+| `--pd-deadband` | 12 | 규칙 기반: 불감대 = deadband × 난이도 |
+| `--fast-capture`, `--fixed-clip` | 꺼짐 | JPEG 스크린샷 (효과 작음) |
+| `--overlap-key` | 꺼짐 | 사용 금지: 키 누름이 약 97ms로 두 배가 되어 거리 급감 |
 
 실행 기록은 `logs/live_test.csv`, 마지막 화면은 `logs/live_test.last.png`에
 저장됩니다. 실제와 시뮬레이션 차이를 다시 조정할 때 이 로그의 측정 각도,
@@ -522,6 +578,7 @@ python live_browser_test.py --control `
 | v13 | `1.5 초과 → 1.0 미만` 회복 이벤트 보상, 약 50.8만 | 비교용 |
 | v14 | 빠른 중앙 접근 시작 상태와 중앙 통과 전 감속 보상, 약 101.6만 | 실게임 시험용 |
 | v15 | 위험 접근 `NONE` 감점과 감속·통과 보상 강화, 약 50.8만 | 실패 분석용 |
+| v16 | v9에서 실측 판단 간격(3~5프레임), 관측 지연 최대 2로 50만 추가 학습 | 시뮬레이터 75.1m (v9 72.1m), 실게임 미측정 |
 
 실환경형 동일 200개 시드의 주요 결과:
 
