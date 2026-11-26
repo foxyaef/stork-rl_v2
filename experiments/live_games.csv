@@ -1,0 +1,52 @@
+experiment,date,agent,capture,estimator_action_scale,estimator_physics_scale,options,game,distance_m,distance_source,log_file,notes
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,1,77,log_estimate,base_v9.csv,team default estimator
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,2,30,log_estimate,base_v9.csv,team default estimator
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,3,11,log_estimate,base_v9.csv,team default estimator
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,4,11,log_estimate,base_v9.csv,team default estimator
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,5,4,log_estimate,base_v9.csv,team default estimator
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,6,28,log_estimate,base_v9.csv,team default estimator
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,7,11,log_estimate,base_v9.csv,team default estimator
+base_v9,2026-11-25,ppo_v9,screenshot,0.25,0.25,,8,26,log_estimate,base_v9.csv,team default estimator
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,1,15,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,2,19,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,3,32,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,4,30,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,5,36,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,6,17,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,7,36,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,8,21,log_estimate,v9_scale08.csv,
+v9_scale08,2026-11-25,ppo_v9,screenshot,0.8,0.25,--estimator-action-scale 0.8,9,21,log_estimate,v9_scale08.csv,
+v9_phys08,2026-11-25,ppo_v9,screenshot,0.8,0.8,--estimator-action-scale 0.8 --estimator-physics-scale 0.8,1,38,screen,v9_phys08.csv,
+v9_phys08,2026-11-25,ppo_v9,screenshot,0.8,0.8,--estimator-action-scale 0.8 --estimator-physics-scale 0.8,2,55,screen,v9_phys08.csv,
+v9_phys08,2026-11-25,ppo_v9,screenshot,0.8,0.8,--estimator-action-scale 0.8 --estimator-physics-scale 0.8,3,59,screen,v9_phys08.csv,
+v9_phys08,2026-11-25,ppo_v9,screenshot,0.8,0.8,--estimator-action-scale 0.8 --estimator-physics-scale 0.8,4,34,screen,v9_phys08.csv,
+v9_phys08,2026-11-25,ppo_v9,screenshot,0.8,0.8,--estimator-action-scale 0.8 --estimator-physics-scale 0.8,5,57,screen,v9_phys08.csv,
+v9_phys08,2026-11-25,ppo_v9,screenshot,0.8,0.8,--estimator-action-scale 0.8 --estimator-physics-scale 0.8,6,53,screen,v9_phys08.csv,
+v9_phys08,2026-11-25,ppo_v9,screenshot,0.8,0.8,--estimator-action-scale 0.8 --estimator-physics-scale 0.8,7,50,screen,v9_phys08.csv,
+pd_default08,2026-11-26,rule_pd_12_12,screenshot,0.8,0.8,--agent pd,1,80,screen,pd_default08.csv,
+pd_default08,2026-11-26,rule_pd_12_12,screenshot,0.8,0.8,--agent pd,2,36,screen,pd_default08.csv,
+pd_default08,2026-11-26,rule_pd_12_12,screenshot,0.8,0.8,--agent pd,3,29,screen,pd_default08.csv,
+pd_default08,2026-11-26,rule_pd_12_12,screenshot,0.8,0.8,--agent pd,4,71,screen,pd_default08.csv,
+pd_default08,2026-11-26,rule_pd_12_12,screenshot,0.8,0.8,--agent pd,5,31,screen,pd_default08.csv,
+pd_default08,2026-11-26,rule_pd_12_12,screenshot,0.8,0.8,--agent pd,6,27,screen,pd_default08.csv,
+pd_default08,2026-11-26,rule_pd_12_12,screenshot,0.8,0.8,--agent pd,7,21,screen,pd_default08.csv,
+pd_g16_d20,2026-11-26,rule_pd_16_20,screenshot,0.8,0.8,--agent pd --pd-gain 16 --pd-deadband 20,1,43,screen,pd_g16_d20.csv,
+pd_g16_d20,2026-11-26,rule_pd_16_20,screenshot,0.8,0.8,--agent pd --pd-gain 16 --pd-deadband 20,2,50,screen,pd_g16_d20.csv,
+pd_g16_d20,2026-11-26,rule_pd_16_20,screenshot,0.8,0.8,--agent pd --pd-gain 16 --pd-deadband 20,3,39,screen,pd_g16_d20.csv,
+pd_g16_d20,2026-11-26,rule_pd_16_20,screenshot,0.8,0.8,--agent pd --pd-gain 16 --pd-deadband 20,4,34,screen,pd_g16_d20.csv,
+pd_g16_d20,2026-11-26,rule_pd_16_20,screenshot,0.8,0.8,--agent pd --pd-gain 16 --pd-deadband 20,5,38,screen,pd_g16_d20.csv,
+pd_g16_d20,2026-11-26,rule_pd_16_20,screenshot,0.8,0.8,--agent pd --pd-gain 16 --pd-deadband 20,6,33,screen,pd_g16_d20.csv,
+pd_g16_d20,2026-11-26,rule_pd_16_20,screenshot,0.8,0.8,--agent pd --pd-gain 16 --pd-deadband 20,7,41,screen,pd_g16_d20.csv,
+v9_fast,2026-11-26,ppo_v9,screenshot,0.8,0.8,--overlap-key,1,6,screen,v9_fast.csv,failed: key hold doubled to ~97 ms
+v9_fast,2026-11-26,ppo_v9,screenshot,0.8,0.8,--overlap-key,2,16,screen,v9_fast.csv,failed: key hold doubled to ~97 ms
+v9_fast,2026-11-26,ppo_v9,screenshot,0.8,0.8,--overlap-key,3,9,screen,v9_fast.csv,failed: key hold doubled to ~97 ms
+cast_v9,2026-11-26,ppo_v9,screencast,0.8,0.8,--capture screencast --debug-every 3,1,419,screen,cast_v9.csv,
+cast_v9,2026-11-26,ppo_v9,screencast,0.8,0.8,--capture screencast --debug-every 3,2,518,screen,cast_v9.csv,
+cast_v9,2026-11-26,ppo_v9,screencast,0.8,0.8,--capture screencast --debug-every 3,3,328,screen,cast_v9.csv,
+cast_v9,2026-11-26,ppo_v9,screencast,0.8,0.8,--capture screencast --debug-every 3,4,346,screen,cast_v9.csv,
+cast_v9,2026-11-26,ppo_v9,screencast,0.8,0.8,--capture screencast --debug-every 3,5,435,screen,cast_v9.csv,
+cast_pd,2026-11-26,rule_pd_12_12,screencast,0.8,0.8,--capture screencast --debug-every 3 --agent pd,1,356,screen,cast_pd.csv,
+cast_pd,2026-11-26,rule_pd_12_12,screencast,0.8,0.8,--capture screencast --debug-every 3 --agent pd,2,546,screen,cast_pd.csv,
+cast_pd,2026-11-26,rule_pd_12_12,screencast,0.8,0.8,--capture screencast --debug-every 3 --agent pd,3,584,screen,cast_pd.csv,
+cast_pd,2026-11-26,rule_pd_12_12,screencast,0.8,0.8,--capture screencast --debug-every 3 --agent pd,4,481,screen,cast_pd.csv,
+cast_pd,2026-11-26,rule_pd_12_12,screencast,0.8,0.8,--capture screencast --debug-every 3 --agent pd,5,452,screen,separate run,

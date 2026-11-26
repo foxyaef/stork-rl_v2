@@ -159,9 +159,46 @@ v14와 같은 60/30/10 시작 상태를 사용하면서 감속 성공 보상과 
 학습이 길어질수록 같은 우회 경향이 강해져 추가 50만 학습을 진행하지 않았습니다.
 v15는 실패 분석용으로 보존하며 기본 모델은 v9입니다.
 
+## v16: 실측 판단 간격 반영 재학습
+
+실제 게임 로그(스크린샷 캡처)에서 판단 간격이 약 3.6프레임으로 측정되어,
+판단 3~5프레임, 미래 예측 3~5프레임, 관측 지연 최대 2프레임 조건으로 v9에서
+50만 결정을 이어 학습했습니다.
+
+```powershell
+python train.py --profile browser --steps 500000 --envs 8 --learning-rate 0.0001 `
+  --decision-frames-min 3 --decision-frames-max 5 --observation-delay-max 2 `
+  --projection-frames-min 3 --projection-frames-max 5 `
+  --resume-model models_browser_v9\stork_ppo.zip `
+  --resume-stats models_browser_v9\vec_normalize.pkl `
+  --output models_browser_v16
+```
+
+같은 조건(판단 3~5, 예측 3~5, 관측 지연 최대 2)의 200판 평가입니다.
+
+| 지표 | v9 | v16 |
+|---|---:|---:|
+| 평균 거리 | 72.1m | 75.1m |
+| 중앙 거리 | 66.0m | 68.5m |
+| p10 / p90 | 27m / 124m | 32m / 131m |
+| 최고 거리 | 183m | 229m |
+| 평균 생존 | 53.50초 | 54.84초 |
+| 입력 뒤 `NONE` | 55.5% | 57.6% |
+| 즉시 반전 | 24.3% | 22.4% |
+| 평균 절대 각도 | 10.73도 | 11.60도 |
+| `|vel|>1` 체류 | 42.1% | 43.7% |
+| 위험 구간 회복률 | 97.5% | 97.6% |
+
+거리는 약 4% 늘었지만 평균 절대 각도와 고각속도 체류가 조금 나빠져 v9보다
+확실히 낫다고 보기는 어렵습니다. 실제 게임에서는 아직 측정하지 않았습니다.
+이후 화면 스트리밍 캡처로 실제 판단 간격이 약 1프레임까지 줄어 v16의 학습
+조건과 다시 달라졌습니다. 실제 게임 결과는 [LIVE_RESULTS.md](LIVE_RESULTS.md)에
+있습니다.
+
 ## 저장 위치
 
 - 실제 브라우저 권장: `models_browser_v9/stork_ppo.zip`
+- 실측 판단 간격 반영 재학습 (실게임 미측정): `models_browser_v16/stork_ppo.zip`
 - 과속 중앙 통과 대응 시험용: `models_browser_v14/stork_ppo.zip`
 - 위험 접근 `NONE` 감점 실패 분석: `models_browser_v15/stork_ppo.zip`
 - v9 정규화 통계: `models_browser_v9/vec_normalize.pkl`

@@ -5,7 +5,7 @@ from pathlib import Path
 from statistics import mean, median
 
 from stork_rl import BrowserStorkEnv
-from stork_rl.agents import heuristic_action
+from stork_rl.agents import heuristic_action, lookahead_action, pd_action
 
 
 def parse_args() -> argparse.Namespace:
@@ -13,7 +13,21 @@ def parse_args() -> argparse.Namespace:
         description="Evaluate a policy under randomized browser timing."
     )
     parser.add_argument("--episodes", type=int, default=100)
-    parser.add_argument("--agent", choices=("model", "heuristic"), default="model")
+    parser.add_argument(
+        "--agent", choices=("model", "heuristic", "lookahead", "pd"), default="model"
+    )
+    parser.add_argument("--lookahead-horizon", type=int, default=2)
+    parser.add_argument("--lookahead-weight", type=float, default=16.0)
+    parser.add_argument("--pd-gain", type=float, default=12.0)
+    parser.add_argument("--pd-deadband", type=float, default=12.0)
+    # Timing of the simulated control loop (defaults = BrowserStorkEnv defaults).
+    parser.add_argument("--decision-frames-min", type=int, default=4)
+    parser.add_argument("--decision-frames-max", type=int, default=8)
+    parser.add_argument("--pulse-frames-min", type=int, default=1)
+    parser.add_argument("--pulse-frames-max", type=int, default=2)
+    parser.add_argument("--action-delay-max", type=int, default=1)
+    parser.add_argument("--observation-delay-max", type=int, default=1)
+    parser.add_argument("--missed-pulse-probability", type=float, default=0.03)
     parser.add_argument(
         "--model", type=Path, default=Path("models_browser/stork_ppo.zip")
     )
@@ -36,6 +50,14 @@ def main() -> None:
             args.projection_frames_min,
             args.projection_frames_max,
         ),
+        "decision_frames_range": (
+            args.decision_frames_min,
+            args.decision_frames_max,
+        ),
+        "pulse_frames_range": (args.pulse_frames_min, args.pulse_frames_max),
+        "action_delay_frames_range": (0, args.action_delay_max),
+        "observation_delay_frames_range": (0, args.observation_delay_max),
+        "missed_pulse_probability": args.missed_pulse_probability,
     }
     env = BrowserStorkEnv(**env_kwargs)
     model = normalizer = None
@@ -79,7 +101,19 @@ def main() -> None:
             observation, _ = env.reset(seed=args.seed + episode)
             previous_action = 0
             while True:
-                if model is None:
+                if args.agent == "lookahead":
+                    action = lookahead_action(
+                        observation,
+                        horizon=args.lookahead_horizon,
+                        velocity_weight=args.lookahead_weight,
+                    )
+                elif args.agent == "pd":
+                    action = pd_action(
+                        observation,
+                        velocity_gain=args.pd_gain,
+                        deadband=args.pd_deadband,
+                    )
+                elif model is None:
                     action = heuristic_action(observation)
                 else:
                     normalized = normalizer.normalize_obs(observation[None, :])
